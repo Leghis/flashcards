@@ -18,7 +18,7 @@ interface WordStats {
 }
 
 interface Word {
-    consecutiveSuccess: number | 0;
+    consecutiveSuccess: number;
     en: string;
     fr: string;
     stats: WordStats;
@@ -119,103 +119,14 @@ const FlashcardGame: React.FC = () => {
         }, {mastered: 0, learning: 0, totalProgress: 0, averageProgress: 0});
     }, [words]);
 
-    // Fonction de sauvegarde simplifiée
-    const saveToLocalStorage = (wordsToSave: Word[]) => {
+
+    // Au début du composant FlashcardGame
+    const saveToLocalStorage = useCallback((wordsToSave: Word[]) => {
         localStorage.setItem('flashcard-words', JSON.stringify(wordsToSave));
-    };
+    }, []);
 
 
-    // Enhanced word selection system
-    const selectNextCard = useCallback(() => {
-        if (words.length === 0) {
-            setCurrentCard(null);
-            return;
-        }
-
-        // Vérifier s'il reste des mots non maîtrisés
-        const nonMasteredWords = words.filter(word => !checkMastery(word));
-
-        if (nonMasteredWords.length === 0) {
-            setCurrentCard(null);
-            return;
-        }
-
-        const nextWord = selectNextWord(words);
-
-        if (nextWord) {
-            // Déterminer la direction d'apprentissage basée sur les performances
-            const enToFrRatio = nextWord.stats.correctEnToFr / (nextWord.stats.totalEnToFr || 1);
-            const frToEnRatio = nextWord.stats.correctFrToEn / (nextWord.stats.totalFrToEn || 1);
-
-            // Choisir la direction où l'utilisateur a le plus de difficultés
-            const newDirection = enToFrRatio < frToEnRatio ? 'en-fr' : 'fr-en';
-
-            // Ajouter un peu d'aléatoire pour ne pas toujours avoir la même direction
-            const shouldRandomizeDirection = Math.random() < 0.2; // 20% de chance
-
-            setDirection(shouldRandomizeDirection ? (Math.random() > 0.5 ? 'en-fr' : 'fr-en') : newDirection);
-            setCurrentCard(nextWord);
-            setLastCard(nextWord);
-            setIsFlipped(false);
-        }
-    }, [words, lastCard]);
-
-
-    // Modifie la fonction handleResponse
-    const handleResponse = useCallback((correct: boolean) => {
-        if (!currentCard || isTransitioning) return;
-
-        setAnimation(correct ? 'success' : 'error');
-        setIsTransitioning(true);
-
-        const updatedWords = words.map(word => {
-            if (word === currentCard) {
-                const updatedStats = {...word.stats};
-
-                if (direction === 'en-fr') {
-                    updatedStats.totalEnToFr += 1;
-                    if (correct) updatedStats.correctEnToFr += 1;
-                } else {
-                    updatedStats.totalFrToEn += 1;
-                    if (correct) updatedStats.correctFrToEn += 1;
-                }
-
-                // Mise à jour des réussites consécutives
-                const consecutiveSuccess = correct ?
-                    (word.consecutiveSuccess || 0) + 1 : 0;
-
-                return {
-                    ...word,
-                    stats: updatedStats,
-                    consecutiveSuccess,
-                    lastReviewed: Date.now()
-                };
-            }
-            return word;
-        });
-
-        setWords(updatedWords);
-        saveToLocalStorage(updatedWords);
-
-        // Préparer la prochaine carte
-        const next = selectNextWord(updatedWords);
-
-        // Nouvelle séquence d'animation
-        setTimeout(() => {
-            setAnimation('');
-            // Retourner la carte face cachée d'abord
-            setIsFlipped(false);
-
-            // Attendre que la carte soit face cachée
-            setTimeout(() => {
-                // Changer le contenu
-                setCurrentCard(next);
-                setIsTransitioning(false);
-            }, 300); // Moitié du temps de l'animation de retournement
-        }, 1000);
-    }, [currentCard, direction, words, isTransitioning]);
-
-    const selectNextWord = (currentWords: Word[]): Word | null => {
+    const selectNextWord = useCallback((currentWords: Word[]): Word | null => {
         if (currentWords.length === 0) return null;
 
         const now = Date.now();
@@ -275,7 +186,103 @@ const FlashcardGame: React.FC = () => {
         }
 
         return weightedWords[0].word;
-    };
+    }, [lastCard]);
+
+    // Enhanced word selection system
+    const selectNextCard = useCallback(() => {
+        if (words.length === 0) {
+            setCurrentCard(null);
+            return;
+        }
+
+        // Vérifier s'il reste des mots non maîtrisés
+        const nonMasteredWords = words.filter(word => !checkMastery(word));
+
+        if (nonMasteredWords.length === 0) {
+            setCurrentCard(null);
+            return;
+        }
+
+        const nextWord = selectNextWord(words);
+
+        if (nextWord) {
+            // Déterminer la direction d'apprentissage basée sur les performances
+            const enToFrRatio = nextWord.stats.correctEnToFr / (nextWord.stats.totalEnToFr || 1);
+            const frToEnRatio = nextWord.stats.correctFrToEn / (nextWord.stats.totalFrToEn || 1);
+
+            // Choisir la direction où l'utilisateur a le plus de difficultés
+            const newDirection = enToFrRatio < frToEnRatio ? 'en-fr' : 'fr-en';
+
+            // Ajouter un peu d'aléatoire pour ne pas toujours avoir la même direction
+            const shouldRandomizeDirection = Math.random() < 0.2; // 20% de chance
+
+            setDirection(shouldRandomizeDirection ? (Math.random() > 0.5 ? 'en-fr' : 'fr-en') : newDirection);
+            setCurrentCard(nextWord);
+            setLastCard(nextWord);
+            setIsFlipped(false);
+        }
+    }, [words, lastCard,selectNextWord]);
+
+
+
+
+
+    // Modifie la fonction handleResponse
+    const handleResponse = useCallback((correct: boolean) => {
+        if (!currentCard || isTransitioning) return;
+
+        setAnimation(correct ? 'success' : 'error');
+        setIsTransitioning(true);
+
+        const updatedWords = words.map(word => {
+            if (word === currentCard) {
+                const updatedStats = {...word.stats};
+
+                if (direction === 'en-fr') {
+                    updatedStats.totalEnToFr += 1;
+                    if (correct) updatedStats.correctEnToFr += 1;
+                } else {
+                    updatedStats.totalFrToEn += 1;
+                    if (correct) updatedStats.correctFrToEn += 1;
+                }
+
+                // Mise à jour des réussites consécutives
+                const consecutiveSuccess = correct ?
+                    (word.consecutiveSuccess || 0) + 1 : 0;
+
+                return {
+                    ...word,
+                    stats: updatedStats,
+                    consecutiveSuccess,
+                    lastReviewed: Date.now()
+                };
+            }
+            return word;
+        });
+
+        setWords(updatedWords);
+        saveToLocalStorage(updatedWords);
+
+        // Préparer la prochaine carte
+        const next = selectNextWord(updatedWords);
+
+        // Nouvelle séquence d'animation
+        setTimeout(() => {
+            setAnimation('');
+            // Retourner la carte face cachée d'abord
+            setIsFlipped(false);
+
+            // Attendre que la carte soit face cachée
+            setTimeout(() => {
+                // Changer le contenu
+                setCurrentCard(next);
+                setIsTransitioning(false);
+            }, 300); // Moitié du temps de l'animation de retournement
+        }, 1000);
+    }, [currentCard, direction, words, isTransitioning, selectNextWord, saveToLocalStorage]);
+
+
+
 
     // Enhanced word addition system
     const addNewWord = useCallback(() => {
@@ -322,7 +329,7 @@ const FlashcardGame: React.FC = () => {
             // Clear success message after 3 seconds
             setTimeout(() => setMessage(null), 3000);
 
-        } catch (error) {
+        } catch (error:any) {
             setMessage({
                 type: 'error',
                 text: error.message
@@ -347,7 +354,7 @@ const FlashcardGame: React.FC = () => {
             saveToLocalStorage(initialWords);
         }
         setIsInitialized(true);
-    }, []);
+    }, [saveToLocalStorage]);
 
     // Sélection de la première carte
     useEffect(() => {

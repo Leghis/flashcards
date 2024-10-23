@@ -134,6 +134,6 @@ Pour toute question ou problème :
 
 ---
 
-Créé avec ❤️ par [Votre Nom]
+Créé avec ❤️ par Ayina Maerik
 
 [Lien vers la démo en direct](https://votre-url.com)
