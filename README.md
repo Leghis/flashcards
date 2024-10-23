@@ -114,7 +114,7 @@ npm run test     # Lancer les tests
 
 L'application peut être déployée sur Vercel :
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/flashcards)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Leghis/flashcards)
 
 ## Contribution
 Les contributions sont les bienvenues ! Voir `CONTRIBUTING.md` pour les détails.
