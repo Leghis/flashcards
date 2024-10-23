@@ -1,36 +1,139 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FlashCards - Application d'Apprentissage par Cartes Mémoire
 
-## Getting Started
+## Description
+FlashCards est une application web moderne d'apprentissage par cartes mémoire, conçue pour faciliter l'apprentissage des langues, particulièrement l'anglais et le français. Elle utilise un système sophistiqué de répétition espacée et de suivi des progrès pour optimiser la mémorisation à long terme.
 
-First, run the development server:
+## Fonctionnalités Principales
+
+### Système d'Apprentissage
+- Cartes recto-verso interactives
+- Alternance automatique entre anglais-français et français-anglais
+- Système de progression rigoureux basé sur :
+    - Minimum de 10 tentatives par mot
+    - Taux de réussite requis de 80%
+    - Séquence de 5 réussites consécutives nécessaire
+- Pénalités pour les erreurs (-10% par erreur)
+
+### Suivi des Progrès
+- Statistiques détaillées par mot
+- Indicateur de progression en pourcentage
+- Système de "maîtrise" des mots
+- Historique des performances
+
+### Interface Utilisateur
+- Design moderne et responsive
+- Animations fluides
+- Retours visuels instantanés
+- Mode sombre/clair automatique
+
+## Prérequis Techniques
+- Node.js (version 16.x ou supérieure)
+- npm ou yarn
+- Navigateur web moderne
+
+## Installation
 
 ```bash
+# Cloner le repository
+git clone [URL_DU_REPO]
+
+# Installer les dépendances
+npm install
+# ou
+yarn install
+
+# Lancer le serveur de développement
 npm run dev
-# or
+# ou
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Structure du Projet
+```
+/
+├── components/         # Composants React réutilisables
+├── styles/            # Fichiers CSS et styles
+├── lib/              # Fonctions utilitaires
+├── types/            # Définitions TypeScript
+└── app/              # Pages et layout principal
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Technologies Utilisées
+- Next.js 13+
+- React 18
+- TypeScript
+- Tailwind CSS
+- Framer Motion (animations)
+- Shadcn/ui (composants UI)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Algorithme d'Apprentissage
 
-## Learn More
+### Calcul de la Progression
+```javascript
+Progression = (Taux de réussite × 100) - (Nombre d'erreurs × 10)
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Critères de Maîtrise
+- Minimum 10 tentatives
+- Taux de réussite ≥ 80%
+- 5 réussites consécutives
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Personnalisation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Modification des Seuils
+```typescript
+const MASTERY_THRESHOLD = 10;    // Nombre minimum de tentatives
+const MASTERY_RATIO = 0.8;       // Taux de réussite requis (80%)
+const CONSECUTIVE_SUCCESS = 5;    // Réussites consécutives nécessaires
+```
 
-## Deploy on Vercel
+## Utilisation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Lancer l'application
+2. Ajouter des mots via le bouton "Nouveau mot"
+3. Cliquer sur les cartes pour les retourner
+4. Indiquer si le mot est acquis ou non
+5. Suivre sa progression dans les statistiques
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Développement
+
+### Scripts Disponibles
+```bash
+npm run dev      # Mode développement
+npm run build    # Construction production
+npm run start    # Démarrage production
+npm run lint     # Vérification du code
+```
+
+### Tests
+```bash
+npm run test     # Lancer les tests
+```
+
+## Déploiement
+
+L'application peut être déployée sur Vercel :
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/flashcards)
+
+## Contribution
+Les contributions sont les bienvenues ! Voir `CONTRIBUTING.md` pour les détails.
+
+## Licence
+Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+
+## Support
+Pour toute question ou problème :
+- Ouvrir une issue sur GitHub
+- Contacter l'équipe de développement
+
+## Remerciements
+- Équipe Next.js
+- Contributeurs
+- Communauté open source
+
+---
+
+Créé avec ❤️ par [Votre Nom]
+
+[Lien vers la démo en direct](https://votre-url.com)
