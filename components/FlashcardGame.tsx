@@ -301,34 +301,40 @@ const FlashcardGame: React.FC = () => {
             );
 
             if (existingWord) {
-                // Si le mot existe et est mémorisé, on le réinitialise
-                const updatedWords = words.map(w => {
-                    if (w === existingWord) {
-                        return {
-                            ...w,
-                            consecutiveSuccess: 0,
-                            stats: {
-                                correctEnToFr: 0,
-                                totalEnToFr: 0,
-                                correctFrToEn: 0,
-                                totalFrToEn: 0
-                            },
-                            interval: 1,
-                            easeFactor: INITIAL_EASE_FACTOR,
-                            repetitions: 0,
-                            lastReviewed: null,
-                            nextReview: null
-                        };
-                    }
-                    return w;
-                });
+                // Vérifier si le mot est mémorisé
+                if (checkMastery(existingWord)) {
+                    // Si le mot est mémorisé, on le réinitialise
+                    const updatedWords = words.map(w => {
+                        if (w === existingWord) {
+                            return {
+                                ...w,
+                                consecutiveSuccess: 0,
+                                stats: {
+                                    correctEnToFr: 0,
+                                    totalEnToFr: 0,
+                                    correctFrToEn: 0,
+                                    totalFrToEn: 0
+                                },
+                                interval: 1,
+                                easeFactor: INITIAL_EASE_FACTOR,
+                                repetitions: 0,
+                                lastReviewed: null,
+                                nextReview: null
+                            };
+                        }
+                        return w;
+                    });
 
-                setWords(updatedWords);
-                saveToLocalStorage(updatedWords);
-                setMessage({
-                    type: 'success',
-                    text: 'Mot réinitialisé et remis en apprentissage !'
-                });
+                    setWords(updatedWords);
+                    saveToLocalStorage(updatedWords);
+                    setMessage({
+                        type: 'success',
+                        text: 'Mot réinitialisé et remis en apprentissage !'
+                    });
+                } else {
+                    // Si le mot existe mais n'est pas mémorisé
+                    throw new Error("Ce mot existe déjà");
+                }
             } else {
                 // Ajouter un nouveau mot
                 const newWord: Word = {
@@ -367,6 +373,7 @@ const FlashcardGame: React.FC = () => {
             setTimeout(() => setMessage(null), 3000);
         }
     }, [newWordEn, newWordFr, words, saveToLocalStorage]);
+
 
     const hasRemainingWords = useCallback(() => {
         return words.some(word => !checkMastery(word));
