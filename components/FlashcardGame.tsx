@@ -294,39 +294,69 @@ const FlashcardGame: React.FC = () => {
                 throw new Error("Les deux champs sont requis");
             }
 
-            // Check for duplicates
-            if (words.some(w =>
+            // Vérifier si le mot existe déjà
+            const existingWord = words.find(w =>
                 w.en.toLowerCase() === trimmedEn.toLowerCase() ||
                 w.fr.toLowerCase() === trimmedFr.toLowerCase()
-            )) {
-                throw new Error("Ce mot existe déjà");
+            );
+
+            if (existingWord) {
+                // Si le mot existe et est mémorisé, on le réinitialise
+                const updatedWords = words.map(w => {
+                    if (w === existingWord) {
+                        return {
+                            ...w,
+                            consecutiveSuccess: 0,
+                            stats: {
+                                correctEnToFr: 0,
+                                totalEnToFr: 0,
+                                correctFrToEn: 0,
+                                totalFrToEn: 0
+                            },
+                            interval: 1,
+                            easeFactor: INITIAL_EASE_FACTOR,
+                            repetitions: 0,
+                            lastReviewed: null,
+                            nextReview: null
+                        };
+                    }
+                    return w;
+                });
+
+                setWords(updatedWords);
+                saveToLocalStorage(updatedWords);
+                setMessage({
+                    type: 'success',
+                    text: 'Mot réinitialisé et remis en apprentissage !'
+                });
+            } else {
+                // Ajouter un nouveau mot
+                const newWord: Word = {
+                    consecutiveSuccess: 0,
+                    en: trimmedEn,
+                    fr: trimmedFr,
+                    stats: {correctEnToFr: 0, totalEnToFr: 0, correctFrToEn: 0, totalFrToEn: 0},
+                    interval: 1,
+                    easeFactor: INITIAL_EASE_FACTOR,
+                    repetitions: 0,
+                    lastReviewed: null,
+                    nextReview: null
+                };
+
+                const updatedWords = [...words, newWord];
+                setWords(updatedWords);
+                saveToLocalStorage(updatedWords);
+                setMessage({
+                    type: 'success',
+                    text: 'Nouveau mot ajouté avec succès !'
+                });
             }
-
-            const newWord: Word = {
-                consecutiveSuccess: 0,
-                en: trimmedEn,
-                fr: trimmedFr,
-                stats: {correctEnToFr: 0, totalEnToFr: 0, correctFrToEn: 0, totalFrToEn: 0},
-                interval: 1,
-                easeFactor: INITIAL_EASE_FACTOR,
-                repetitions: 0,
-                lastReviewed: null,
-                nextReview: null
-            };
-
-            const updatedWords = [...words, newWord];
-            setWords(updatedWords);
-            saveToLocalStorage(updatedWords);
 
             setNewWordEn('');
             setNewWordFr('');
             setShowAddForm(false);
-            setMessage({
-                type: 'success',
-                text: 'Nouveau mot ajouté avec succès !'
-            });
 
-            // Clear success message after 3 seconds
+            // Clear message after 3 seconds
             setTimeout(() => setMessage(null), 3000);
 
         } catch (error:any) {
@@ -334,8 +364,6 @@ const FlashcardGame: React.FC = () => {
                 type: 'error',
                 text: error.message
             });
-
-            // Clear error message after 3 seconds
             setTimeout(() => setMessage(null), 3000);
         }
     }, [newWordEn, newWordFr, words, saveToLocalStorage]);
